@@ -12,10 +12,9 @@ def front_back(str):
   return (front+med+back)
 
 def front3(str):
-  if len(str) <= 0:
-    return str
-  str2 = str[len(str)-3]
-  return str2
+  str = str[3:]
+
+x = "Manel"
 
 print(front3("Chocolate"))
-print(front_back("code"))
+print(x[:3])

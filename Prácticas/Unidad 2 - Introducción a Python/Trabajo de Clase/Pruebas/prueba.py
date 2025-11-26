@@ -1,20 +1,4 @@
-str = "code"
-l = len(str)
-front = str[l-1]
-medio = str[1:l-1]
-back = str[0]
+key = "Hola_12345Mundo0o_"
 
-def front_back(str):
-  l = len(str)
-  front = str[l-1]
-  med = str[1:l-1]
-  back = str[0]
-  return (front+med+back)
-
-def front3(str):
-  str = str[3:]
-
-x = "Manel"
-
-print(front3("Chocolate"))
-print(x[:3])
+print(key[:3])
+print(key[3:])

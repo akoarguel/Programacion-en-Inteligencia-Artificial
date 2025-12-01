@@ -20,10 +20,6 @@ def encrytion(msg, key):
     code = enc4(msg, key)
     return code
 
-##def decoded(code, key):
-##    
-
-
 def enc1(msg, key):
     ## Si empieza por numero
     ### resto 1 a cada chr
@@ -40,24 +36,17 @@ def enc1(msg, key):
     return new_msg
 
 def enc2(msg, key):
-    ## Suma del cod del chr de los impares DE LA CLAVE
-    ### -
-    ## Suma del cod del chr de los pares DE LA CLAVE
-    ### El resultado se lo sumo al cod de todos los caracteres
+    n = len(msg)
     
-    list_key = list(key)
-    pares = 0
-    impares = 0
-    for i in range(0, len(key), 2):
-        pares += ord(list_key[i])
-    for i in range(1, len(key), 2):
-        impares += ord(list_key[i])
-
-    new_msg = ""
-    x = pares-impares
-    for letra in msg:
-        new_msg += chr(ord(letra)+x)
-    return new_msg
+    if len(key) > 15:
+        mitad = n // 2
+        msg_permutado = msg[mitad:] + msg[:mitad]
+    else:
+        chr_impares = msg[1::2]
+        chr_pares = msg[0::2]
+        msg_permutado = chr_impares + chr_pares
+        
+    return msg_permutado
 
 def enc3(msg, key):
     ## Si la key contiene más de 3 números
@@ -88,62 +77,79 @@ def enc3(msg, key):
         for i in new_msg:
             final_msg += i
     return final_msg
-    
+
 def enc4(msg, key):
-    ## Si contiene 2 simbolos o más
-    ### resta 2 a las 3 primeras letras
-    ## Sino
-    ### resta 1 a todos
     cont = 0
-    tiene_dig = False
+    
+    for letra in key:
+        if not letra.isalnum():
+            cont += 1
+            if cont >= 2:
+                break
+    
+    temp_msg = ""
+    n = len(msg)
+
+    if cont >= 2:
+        for i in range(n):
+            letra = msg[i]
+            
+            if i < 3:
+                temp_msg += chr(ord(letra) - 1)
+            else:
+                temp_msg += letra
+            
+    else:
+        punto_inicio = max(0, n - 3)
+        
+        for i in range(n):
+            letra = msg[i]
+
+            if i >= punto_inicio:
+                temp_msg += chr(ord(letra) + 1)
+            else:
+                temp_msg += letra
+    
+    new_msg = temp_msg[::-1]
+    return new_msg
+
+def dec1(encrypted_msg, key):
     new_msg = ""
-    for letra in key:
-        if not letra.isalnum():
-            cont += 1
-            if cont > 1:
-                tiene_dig = True
-                break
-            
-    if tiene_dig:
-        for i in msg[:3]:
-            new_msg += chr(ord(i)-2)
-        for i in msg[3:]:
-            new_msg += i
-        return new_msg
-            
+    if key[0].isalnum():
+        for letra in encrypted_msg:
+            new_msg += chr(ord(letra) + 1)
     else:
-        for i in msg:
-            new_msg += chr(ord(i)+1)
-        return new_msg
+        for letra in encrypted_msg:
+            new_msg += chr(ord(letra) - 1)
+    return new_msg
 
-def des1(code, key):
-    ## Funciona
-    cont = 0
-    tiene_dig = False
-    new_code = ""
-    for letra in key:
-        if not letra.isalnum():
-            cont += 1
-            if cont > 1:
-                tiene_dig = True
-                break
-            
-    if tiene_dig:
-        for i in code[:3]:
-            new_code += chr(ord(i)+2)
-        for i in code[3:]:
-            new_code += i
-        return new_code
+def dec2(encrypted_msg, key):
+    n = len(encrypted_msg)
+    if n == 0:
+        return ""
+        
+    if len(key) > 15:
+        mitad = n // 2
+        plano = encrypted_msg[mitad:] + encrypted_msg[:mitad]
+        
     else:
-        for i in code:
-            new_code += chr(ord(i)+1)
-        return new_code
+        num_impares = n // 2
+        
+        impares_cifrado = encrypted_msg[:num_impares]
+        pares_cifrado = encrypted_msg[num_impares:]
+        
+        plano_lista = [""] * n
+        
+        plano_lista[0::2] = list(pares_cifrado)
+        plano_lista[1::2] = list(impares_cifrado)
+        
+        plano = "".join(plano_lista)
+        
+    return plano
 
-def des2(code, key):
-    # Funciona
+def dec3(encrypted_msg, key):
     cont = 0
     tiene_num = False
-    new_code = ""
     
     for letra in key:
         if letra.isdigit():
@@ -151,44 +157,49 @@ def des2(code, key):
             if cont == 3:
                 tiene_num = True
                 break
-            else:
-                continue
+    
     if tiene_num:
-        new_code = code.swapcase()
-        return new_code
+        plano = encrypted_msg.swapcase()
+        return plano
     else:
-        new_code = []
-        final_code = ""
-        for i in code:
-            new_code.insert(0,i)
-        for i in new_code:
-            final_code += i
-        return final_code
+        return encrypted_msg[::-1]
+    
+def dec4(encrypted_msg, key):
+    cont = 0
+    for letra in key:
+        if not letra.isalnum():
+            cont += 1
+            if cont >= 2:
+                break
+                
+    n = len(encrypted_msg)
 
-def des3(code, key):
-    # No se si funciona
-    list_key = list(key)
-    pares = 0
-    impares = 0
-    for i in range(0, len(key), 2):
-        pares += ord(list_key[i])
-    for i in range(1, len(key), 2):
-        impares += ord(list_key[i])
-
-    new_code = ""
-    x = pares-impares
-    for letra in code:
-        new_code += chr(ord(letra)-x)
-    return new_code
-
-def des4(code, key):
-    new_code = ""
-    if key[0].isalnum():
-        for letra in code:
-            new_code += chr(ord(letra)+1)
+    temp_msg = encrypted_msg[::-1]
+    
+    plano_msg = ""
+    
+    if cont >= 2:
+        for i in range(n):
+            letra = temp_msg[i]
+        
+            if i < 3:
+                plano_msg += chr(ord(letra) + 1)
+            else:
+                plano_msg += letra
+                
+        return plano_msg
+            
     else:
-        for letra in code:
-            new_code += chr(ord(letra)-1)
+        punto_inicio = max(0, n - 3)
+        for i in range(n):
+            letra = temp_msg[i]
+            
+            if i >= punto_inicio:
+                plano_msg += chr(ord(letra) - 1)
+            else:
+                plano_msg += letra
+                
+        return plano_msg
     
 def start():
     key = input("Introduce una key: ")

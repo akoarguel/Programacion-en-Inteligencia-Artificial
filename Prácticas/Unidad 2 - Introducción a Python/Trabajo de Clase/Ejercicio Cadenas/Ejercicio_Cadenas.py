@@ -1,5 +1,19 @@
 ### Ejercicio Cadenas
 
+keys = [
+        "ClaveSegura_2025*AI",       
+        "_MasterFP.Data84Ia!",       
+        "Permutacion$3000key#",      
+        "Python2025-DAM-99!",        
+        "simple.key.1a"              
+    ]
+    
+msgs = [
+        "Manel/Google_84",
+        "Criptografia Simetrica",
+        "Un mensaje con ñ y tildes: ópera."
+    ]
+
 def validate(key):
     if len(key) < 15:
         return False
@@ -9,6 +23,7 @@ def validate(key):
         return False
     else:
         return True
+    
 
 def encrytion(msg, key):
     msg = enc1(msg, key)
@@ -36,6 +51,11 @@ def enc1(msg, key):
     return new_msg
 
 def enc2(msg, key):
+    ## Si la key es mayor que 15
+    ### se intercambian las mitades
+    ## Si no
+    ### Junta los impares y pares
+    
     n = len(msg)
     
     if len(key) > 15:
@@ -53,6 +73,7 @@ def enc3(msg, key):
     ### intercambiamos las mayuculas por mínusculas
     ## Sino
     ### invertimos la palabra
+    
     cont = 0
     tiene_num = False
     new_msg = ""
@@ -79,6 +100,10 @@ def enc3(msg, key):
     return final_msg
 
 def enc4(msg, key):
+    ## Si la key contiene más de 1 simbolo
+    ### Se reta uno a las 3 primeras y se invierte
+    ## Sino
+    ### Se resta uno a las 3 ultimas y se invierte
     cont = 0
     
     for letra in key:
@@ -113,41 +138,20 @@ def enc4(msg, key):
     new_msg = temp_msg[::-1]
     return new_msg
 
-def dec1(encrypted_msg, key):
+def dec1(code, key):
     new_msg = ""
     if key[0].isalnum():
-        for letra in encrypted_msg:
+        for letra in code:
             new_msg += chr(ord(letra) + 1)
     else:
-        for letra in encrypted_msg:
+        for letra in code:
             new_msg += chr(ord(letra) - 1)
     return new_msg
 
-def dec2(encrypted_msg, key):
-    n = len(encrypted_msg)
-    if n == 0:
-        return ""
-        
-    if len(key) > 15:
-        mitad = n // 2
-        plano = encrypted_msg[mitad:] + encrypted_msg[:mitad]
-        
-    else:
-        num_impares = n // 2
-        
-        impares_cifrado = encrypted_msg[:num_impares]
-        pares_cifrado = encrypted_msg[num_impares:]
-        
-        plano_lista = [""] * n
-        
-        plano_lista[0::2] = list(pares_cifrado)
-        plano_lista[1::2] = list(impares_cifrado)
-        
-        plano = "".join(plano_lista)
-        
-    return plano
+def dec2(code, key):
+    ...
 
-def dec3(encrypted_msg, key):
+def dec3(code, key):
     cont = 0
     tiene_num = False
     
@@ -159,12 +163,12 @@ def dec3(encrypted_msg, key):
                 break
     
     if tiene_num:
-        plano = encrypted_msg.swapcase()
+        plano = code.swapcase()
         return plano
     else:
-        return encrypted_msg[::-1]
+        return code[::-1]
     
-def dec4(encrypted_msg, key):
+def dec4(code, key):
     cont = 0
     for letra in key:
         if not letra.isalnum():
@@ -172,9 +176,9 @@ def dec4(encrypted_msg, key):
             if cont >= 2:
                 break
                 
-    n = len(encrypted_msg)
+    n = len(code)
 
-    temp_msg = encrypted_msg[::-1]
+    temp_msg = code[::-1]
     
     plano_msg = ""
     

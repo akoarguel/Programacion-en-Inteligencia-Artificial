@@ -17,17 +17,7 @@ keys = [
 
 msgs = [
     "1234567890",
-    "Manel/Google_84",
-    "Criptografia Simetrica",
-    "Un mensaje con ñ y tildes: ópera.",
-    "Ok",
-    "      ",
-    "user@example.com",
-    "def main(): return 0",
-    "¡Atención! ¿Estás ahí?",
-    "123 + 456 = 579",
-    "",
-    "La cigüeña voló."
+    "Manel/Google_84"
 ]
 
 def validate(key):
@@ -79,6 +69,13 @@ def encryption(msg, key):
     
     return p4
 
+def decoded(code, key):
+    c1 = des_sust1(code, key)
+    print("\tdes_sust1() -> ", c1)
+    c2 = des_sust2(code, key)
+    print("\tdes_sust2() -> ", c2)
+    return c2
+
 def sust1(msg, key):
     """
     Si la clave empieza por un número
@@ -88,7 +85,7 @@ def sust1(msg, key):
     """
     
     new_msg = ""
-    if key[0].isalnum():
+    if key[0].isdigit():
         for letra in msg:
             new_msg += chr(ord(letra)-1)
     else:
@@ -99,13 +96,13 @@ def sust1(msg, key):
 def des_sust1(code, key):
     """
     LOGICA INVERSA
-    Si empieza por alfanumérico
+    Si empieza por número
         Sumo 1 cada chr
     Sino
         Resto 1 a cada chr
     """
     new_code = ""
-    if key[0].isalnum():
+    if key[0].isdigit():
         for letra in code:
             new_code += chr(ord(letra) + 1)
     else:
@@ -117,7 +114,7 @@ def sust2(msg, key):
     """
     Si la key contiene más de 3 mayúsculas
         Se cambian las vocales de la siguiente forma:
-        A = U, E = O, I = &, O = E, U = A
+        A = U, E = O, I = I, O = E, U = A
     Sino
         Sustituye mayúsculas y minúsculas
     """
@@ -146,6 +143,14 @@ def sust2(msg, key):
         return msg.swapcase()
 
 def des_sust2(code, key):
+    """
+    LOGICA INVERSA
+    Si la key contiene más de 3 mayúsculas
+        Se cambian las vocales:
+        U = A, O = E, I = I, E = O, A = U
+    Sino
+        Sustituye mayúsculas y minúsculas
+    """
     cont = 0
     tiene_mayus = False
     
@@ -198,15 +203,46 @@ def sust3(msg, key):
                 break
             
     if tiene_simb:
-        rango = min(3, len(msg)) 
-        for i in range(rango):
+        for i in range(3):
             new_msg += chr(ord(msg[i]) + suma_key)
-        new_msg += msg[rango:]
+        new_msg += msg[3:]
     else:
         new_msg += msg[:-3]
         for letra in msg[-3:]:
             new_msg += chr(ord(letra) + suma_key)
     return new_msg
+
+def des_sust3(code, key):
+    """
+    LÓGICA INVERSA
+    Si la key contiene más de un símbolo
+        Resta la [suma de las 2 primeras letras de la clave]
+    Sino
+        a las 3 últimas
+    """
+    cont = 0
+    tiene_simb = False
+    new_code = ""
+    suma_key = ord(key[0]) + ord(key[1])
+
+    for letra in key:
+        if not letra.isalnum():
+            cont += 1
+            if cont >= 2:
+                tiene_simb = True
+                break
+    if tiene_simb:
+        for i in range(3):
+            new_code += chr(ord(code[i] - suma_key))
+        new_code + code[3:]
+    else:
+        new_code += code[:-3]
+        for letra in code[-3:]:
+            new_code += chr(ord(letra) - suma_key)
+    return new_code
+        
+        
+
 
 def sust4(msg, key):
     ## Si la longitud de la key es par
@@ -230,6 +266,23 @@ def sust4(msg, key):
                 new_msg += msg[i]
     return new_msg
 
+def des_sust4(code, key):
+    new_code = ""
+    es_key_par = len(key) % 2 == 0
+
+    for i in range(len(msg)):
+        if es_key_par:
+            if i % 2 != 0: 
+                new_msg += chr(ord(msg[i]) - 1)
+            else:
+                new_msg += msg[i]
+        else:
+            if i % 2 == 0:
+                new_msg += chr(ord(msg[i]) - 1)
+            else:
+                new_msg += msg[i]
+    return new_msg
+
 def perm1(msg, key):
     ## Si la segunda mitad de la key es más larga de la primera
     ### Invierte la palabra
@@ -239,6 +292,17 @@ def perm1(msg, key):
     primera_parte = key[:mitad]
     segunda_parte = key[mitad:]
     
+    if len(primera_parte) > len(segunda_parte):
+        return msg[::-1]
+    else:
+        if len(msg) < 4:
+            return msg[::-1]
+        return msg[-2:] + msg[2:-2] + msg[:2]
+
+def des_perm1(code, key):
+    mitad = len(key) // 2
+    primera_parte = key[:mitad]
+    segunda_parte = key[mitad:]
     if len(primera_parte) > len(segunda_parte):
         return msg[::-1]
     else:
@@ -283,11 +347,42 @@ def perm2(msg, key):
         
     return new_msg
 
+def des_perm2(msg, key):
+    repite_letra = False
+    fragmento = key[:10]
+    new_msg = ""
+    
+    for letra in fragmento:
+        if fragmento.count(letra) > 1:
+            repite_letra = True
+            break
+        
+    # No se que hacer si es menor así que invertiré la palabra
+    if len(msg) < 6:
+        return msg[::-1]
+
+    if repite_letra:
+        ### Primera por tercera y penúltima por antepenúltima
+        inicio = msg[2] + msg[1] + msg[0]
+        centro = msg[3:-3]
+        final = msg[-1] + msg[-2] + msg[-3]
+        
+        new_msg = inicio + centro + final
+    else:
+        inicio = msg[1] + msg[0]
+        centro = msg[2:-2]
+        final  = msg[-1] + msg[-2]
+        
+        new_msg = inicio + centro + final
+        
+    return new_msg
+    
+
 def perm3(msg, key):
     ## Si la key tiene una volcal en mayúsculas
-    ### posiciones pares primero
-    ## Sino 
     ### posiciones impares primero
+    ## Sino 
+    ### posiciones pares primero
     condicion = False
     pares = msg[::2]
     impares = msg[1::2]
@@ -297,9 +392,29 @@ def perm3(msg, key):
             condicion = True
     
     if condicion:
-        return pares + impares
-    else: 
         return impares + pares
+    else: 
+        return pares + impares
+
+def des_perm3(code, key):
+    condicion = False
+    new_code = ""
+    
+    for letra in key:
+        if letra == 'A' or letra == 'E' or letra == 'I' or letra == 'O' or letra == 'U':
+            condicion = True
+
+    if codición:
+        
+        if code % 2 == 0:
+            impares = code[1::2]
+            pares = code[::2]
+            
+            for i in impares:
+                new_code += i
+                for j in pares:
+                    new_code += i
+    
     
 def perm4(msg, key):
     ## Si la clave tiene más de 8 caracteres únicos
@@ -323,7 +438,24 @@ def perm4(msg, key):
         return new_msg
     else:
         return msg[::-1]
-            
+
+def des_perm4(code, key):
+    new_code = ""
+    caracteres_unicos = []
+    for letra in key:
+        if letra not in caracteres_unicos:
+            caracteres_unicos.append(letra)
+    
+    if len(caracteres_unicos) > 8:
+        for i in range(0, len(msg) - 1, 2):
+            new_code += code[i+1] + code[i]
+        
+        if len(code) % 2 != 0:
+            new_code += code[-1]
+        
+        return new_code
+    else:
+        return code[::-1]
         
     
 def start():
@@ -341,9 +473,14 @@ def start():
         
         for msg in msgs:
             print("\nMSG --> ", msg)
+            print("\nENCRIPTACIÓN...")
             
-            final_res = encryption(msg, key)
-            print("RESULTADO --> ", final_res)
+            final_code = encryption(msg, key)
+            print("CODIGO ENCRIPTADO --> ", final_code)
+
+            print("\nDESENCRIPTACIÓN...")
+            final_msg = decoded(final_code, key)
+            print("MENSAJE DESENCRIPTADO --> ", final_msg)
 
 
 start()

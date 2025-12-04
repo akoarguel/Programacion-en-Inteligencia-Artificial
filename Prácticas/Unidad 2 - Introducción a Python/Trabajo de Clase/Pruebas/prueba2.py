@@ -19,20 +19,33 @@ def perm3(msg, key):
 
 def des_perm3(code, key):
     condicion = False
-    new_code = ""
-    num_impares = (len(code) // 2) + (len(code) % 2)
-    print("impares: ", num_impares)
-    num_pares = len(code) // 2
-    print("pares: ", num_pares)
-    condicion = False
-    
     for letra in key:
         if letra == 'A' or letra == 'E' or letra == 'I' or letra == 'O' or letra == 'U':
             condicion = True
 
+    cant_impares = len(code) // 2
+    cant_pares = len(code) - cant_impares
+
+    texto_pares = ""
+    texto_impares = ""
+
     if condicion:
-        impares = code[:num_pares]
-        print(impares)
+        texto_impares = code[:cant_impares]
+        texto_pares = code[cant_impares:]
+    else:
+        texto_pares = code[:cant_pares]
+        texto_impares = code[cant_pares:]
+
+    new_code = ""
+    
+    for i in range(cant_impares):
+        new_code = new_code + texto_pares[i]
+        new_code = new_code + texto_impares[i] 
+
+    if len(texto_pares) > len(texto_impares):
+        new_code = new_code + texto_pares[-1]
+
+    return new_code
     
         
 p = "hola4"

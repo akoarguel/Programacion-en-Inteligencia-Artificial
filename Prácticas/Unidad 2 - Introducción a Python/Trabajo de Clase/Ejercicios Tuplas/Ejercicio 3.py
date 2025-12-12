@@ -157,7 +157,7 @@ def traduccion(frase, diccionario):
 def start():
     frase = "Me compré un libro sobre ciencia"
     print(traduccion(frase,diccionario))
-            
+    
 
 start()
 

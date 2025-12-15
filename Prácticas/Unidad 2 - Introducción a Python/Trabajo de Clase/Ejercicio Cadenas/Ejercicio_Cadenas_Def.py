@@ -4,20 +4,15 @@ keys = [
     "_MasterFP.Data84Ia!",
     "Permutacion$3000key#",
     "Python2025-DAM-99!",
-    "simple.key.1a",
-    "AAABBBCCC_Repite_Inicio!",
-    "1234567_8901234_Key",
-    "Z_Solo_Letras_Final_A",
-    "Palindromo_omordnilaP",
-    "!!!!!!!......??????",
-    "aeiou_Vocales_Inicio",
-    "AbCdEfGhIjKlMnOpQrSt",
-    "UnaClaveMuyMuyLargaParaVerSiElBufferAguanta_2025"
+    "simple.key.1a"
 ]
 
 msgs = [
     "1234567890",
-    "Manel/Google_84"
+    "Manel/Google_84",
+    "Hola que tal",
+    "Me llamo Neree (estupida)",
+    "es broma!!!!"
 ]
 
 def validate(key):
@@ -466,7 +461,7 @@ def start():
         print("\nCLAVE --> ", key)
         
         if not validate(key):
-            print("Clave válida --> FALSE")
+            print("Clave válida --> FALSE\n")
             continue
         else:
             print("Clave válida --> TRUE\n")
@@ -483,4 +478,61 @@ def start():
             print("MENSAJE DESENCRIPTADO --> ", final_msg)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def start2():
+    print("PRUEBAS")
+    for key in keys:
+        print("clave -> ", key)
+        if not validate(key):
+            print()
+            continue
+        else:
+            print()
+        for msg in msgs():
+            print("msg -> ", msgs)
+            print("Encriptando...")
+            final_code = encryption(msg, key)
+            print("CODIGO ENCRIPTADO --> ", final_code)
+            
+            print("Desencriptando...")
+            final_msg = decoded(final_code, key)
+            print("MENSAJE DESENCRIPTADO --> ", final_msg)
+            
 start()
